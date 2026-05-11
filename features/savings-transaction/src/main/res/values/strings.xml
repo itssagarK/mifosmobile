@@ -36,5 +36,8 @@
     <string name="synced">Synced</string>
     <string name="pending">Pending</string>
     <string name="exporting">Exporting to CSV...</string>
+    <string name="average_deposit">Average Deposit</string>
+    <string name="max_withdrawal">Max Withdrawal</string>
+    <string name="txns_count">%1$d Txns</string>
     <string name="daily_net">Daily Net: $%1$s</string>
 </resources>

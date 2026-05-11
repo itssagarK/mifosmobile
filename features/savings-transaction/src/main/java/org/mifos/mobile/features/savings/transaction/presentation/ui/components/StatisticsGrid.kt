@@ -37,8 +37,8 @@ fun StatisticsGrid(
     val stats = listOf(
         StatItem(stringResource(R.string.total_deposits), totalDeposits, Icons.Default.AccountBalanceWallet, Color(0xFF4CAF50)),
         StatItem(stringResource(R.string.total_withdrawals), totalWithdrawals, Icons.Default.Payments, Color(0xFFF44336)),
-        StatItem("Average Deposit", avgDeposit, Icons.Default.VerticalAlignTop, Color(0xFF2196F3)),
-        StatItem("Max Withdrawal", maxWithdrawal, Icons.Default.VerticalAlignBottom, Color(0xFFFF9800))
+        StatItem(stringResource(R.string.average_deposit), avgDeposit, Icons.Default.VerticalAlignTop, Color(0xFF2196F3)),
+        StatItem(stringResource(R.string.max_withdrawal), maxWithdrawal, Icons.Default.VerticalAlignBottom, Color(0xFFFF9800))
     )
 
     Column(
@@ -63,7 +63,7 @@ fun StatisticsGrid(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = "${transactions.size} Txns",
+                    text = stringResource(R.string.txns_count, transactions.size),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
