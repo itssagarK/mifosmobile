@@ -8,4 +8,4 @@
 #   http://developer.android.com/guide/developing/tools-proguard.html
 
 # Add any custom Keep rules here:
--keep class org.mifos.mobile.features.savings.transaction.data.remote.model.** { *; }
+-keep class org.mifos.mobile.features.group.save.data.remote.model.** { *; }

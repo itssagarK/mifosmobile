@@ -3,654 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Dashboard - Mifos Mobile</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #6750A4;
-            --on-primary: #ffffff;
-            --primary-container: #eaddff;
-            --on-primary-container: #21005d;
-            --surface: #fef7ff;
-            --on-surface: #1d1b20;
-            --surface-variant: #e7e0eb;
-            --on-surface-variant: #49454f;
-            --outline: #79747e;
-            --positive: #1d6d35;
-            --negative: #b3261e;
-            --card-bg: #ffffff;
-            --goal-celebrate: #ffd700;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --primary: #d0bcff;
-                --on-primary: #381e72;
-                --primary-container: #4f378b;
-                --on-primary-container: #eaddff;
-                --surface: #141218;
-                --on-surface: #e6e1e5;
-                --surface-variant: #49454f;
-                --on-surface-variant: #cac4d0;
-                --outline: #938f99;
-                --positive: #81d4a3;
-                --negative: #f2b8b5;
-                --card-bg: #1d1b20;
-                --goal-celebrate: #ffeb3b;
-            }
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes grow { from { height: 0; } to { height: var(--height); } }
-        @keyframes progress { from { width: 0; } to { width: var(--width); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        body {
-            font-family: 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--surface);
-            color: var(--on-surface);
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease;
-        }
-
-        .header {
-            background-color: var(--primary);
-            color: var(--on-primary);
-            padding: 16px 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header h1 { font-size: 20px; font-weight: 400; }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
-            padding-bottom: 100px;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .balance-card {
-            background-color: var(--primary-container);
-            color: var(--on-primary-container);
-            padding: 24px;
-            border-radius: 28px;
-            margin-bottom: 16px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .balance-card.goal-reached {
-            background-color: var(--goal-celebrate);
-            color: #000;
-            animation: pulse 2s infinite;
-        }
-        .balance-card:hover { transform: translateY(-2px); }
-
-        .balance-label { font-size: 14px; opacity: 0.8; margin-bottom: 8px; font-weight: 500; }
-        .balance-amount { font-size: 36px; font-weight: 500; margin-bottom: 16px; }
-
-        .goal-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(128, 128, 128, 0.2);
-            text-align: left;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .goal-section:hover { opacity: 0.8; }
-        .goal-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
-        .goal-bar-bg { height: 8px; background: rgba(128, 128, 128, 0.2); border-radius: 4px; overflow: hidden; }
-        .goal-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; animation: progress 1s ease-out forwards; }
-        .goal-reached .goal-bar-fill { background: #000; }
-        
-        .celebration-msg {
-            font-size: 10px; font-weight: bold; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;
-            display: none;
-        }
-        .goal-reached .celebration-msg { display: block; }
-
-        .balance-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .balance-sub-card {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 20px;
-            border: 1px solid var(--surface-variant);
-            text-align: left;
-            transition: all 0.3s ease;
-        }
-        .balance-sub-card:hover { border-color: var(--primary); }
-
-        .balance-sub-label { font-size: 12px; color: var(--on-surface-variant); margin-bottom: 4px; }
-        .balance-sub-amount { font-size: 18px; font-weight: 500; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-            background: var(--surface-variant);
-            opacity: 0.9;
-            padding: 16px;
-            border-radius: 28px;
-        }
-        .stat-item {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 16px;
-            border: 1px solid var(--surface-variant);
-        }
-        .stat-header { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--on-surface-variant); margin-bottom: 4px; }
-        .stat-value { font-size: 14px; font-weight: 600; }
-
-        .chart-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 28px;
-            border: 1px solid var(--surface-variant);
-            margin-bottom: 24px;
-        }
-        .chart-title { font-size: 14px; font-weight: 500; margin-bottom: 16px; color: var(--on-surface-variant); }
-        .chart-container {
-            display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding: 0 10px;
-        }
-        .chart-bar-wrapper { 
-            display: flex; flex-direction: column; align-items: center; flex: 1; 
-            cursor: pointer; position: relative;
-        }
-        .chart-bar {
-            width: 24px; background: var(--primary); border-radius: 6px 6px 0 0;
-            transition: all 0.3s ease; animation: grow 0.8s ease-out forwards;
-        }
-        .chart-bar:hover { filter: brightness(1.2); }
-        .chart-label { font-size: 10px; color: var(--on-surface-variant); margin-top: 8px; }
-        
-        .chart-tooltip {
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: var(--on-surface); color: var(--surface); padding: 4px 8px; border-radius: 4px;
-            font-size: 10px; display: none; white-space: nowrap; z-index: 100;
-        }
-        .chart-bar-wrapper:hover .chart-tooltip { display: block; }
-
-        .filter-section { margin-bottom: 24px; }
-        .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; margin-top: 12px; scrollbar-width: none; }
-        .filter-chips::-webkit-scrollbar { display: none; }
-
-        .chip {
-            padding: 6px 16px; border-radius: 8px; border: 1px solid var(--outline); font-size: 12px; font-weight: 500;
-            cursor: pointer; white-space: nowrap; transition: all 0.2s; background: transparent; color: var(--on-surface-variant);
-        }
-        .chip.active { background-color: var(--primary-container); color: var(--on-primary-container); border-color: var(--primary); }
-        .chip:hover:not(.active) { background-color: var(--surface-variant); }
-
-        .date-filter-section { display: flex; gap: 12px; margin-top: 16px; align-items: center; }
-        .date-input-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .date-input-group label { font-size: 10px; color: var(--on-surface-variant); }
-        .date-input-group input {
-            padding: 8px 12px; border-radius: 12px; border: 1px solid var(--outline);
-            background: var(--card-bg); color: var(--on-surface); font-size: 12px; width: 100%;
-        }
-
-        .sort-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .sort-select { padding: 4px 12px; border-radius: 8px; border: 1px solid var(--surface-variant); background: var(--card-bg); font-size: 12px; color: var(--on-surface-variant); cursor: pointer; }
-
-        .export-btn {
-            background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 4px 12px;
-            border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-        }
-        .export-btn:hover { background: var(--primary-container); color: var(--on-primary-container); }
-
-        .state-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-        .state-btn {
-            background-color: var(--surface-variant); color: var(--on-surface-variant); border: none; padding: 6px 16px;
-            border-radius: 12px; font-size: 12px; cursor: pointer; transition: all 0.2s;
-        }
-        .state-btn:hover { background-color: var(--primary-container); color: var(--on-primary-container); }
-
-        .sync-all-btn {
-            background: transparent; color: var(--on-primary); border: 1px solid rgba(255,255,255,0.3); padding: 4px 12px;
-            border-radius: 16px; font-size: 12px; cursor: pointer; transition: background 0.2s;
-        }
-        .sync-all-btn:hover { background: rgba(255,255,255,0.1); }
-
-        .search-box {
-            display: flex; align-items: center; background: var(--surface-variant); border-radius: 28px; padding: 12px 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .search-box:focus-within { box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: var(--card-bg); transform: scale(1.01); }
-        .search-box input { flex: 1; border: none; outline: none; background: transparent; font-size: 16px; margin-left: 12px; color: var(--on-surface); }
-        
-        .clear-search { cursor: pointer; padding: 4px; border-radius: 50%; display: none; color: var(--on-surface-variant); }
-        .clear-search:hover { background-color: var(--surface-variant); }
-
-        .transactions-list { display: flex; flex-direction: column; gap: 8px; }
-        
-        .date-header {
-            font-size: 12px; font-weight: 500; color: var(--primary); padding: 16px 8px 8px 8px;
-            position: sticky; top: 52px; background: var(--surface); z-index: 10;
-        }
-
-        .transaction-card {
-            background: var(--card-bg); border: 1px solid var(--surface-variant); border-radius: 16px; padding: 16px; display: flex;
-            justify-content: space-between; align-items: center; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer; animation: slideIn 0.4s ease-out both;
-        }
-        .transaction-card:hover { transform: scale(1.02) translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: var(--primary-container); }
-
-        .type-icon {
-            width: 40px; height: 40px; background: var(--surface-variant); border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; margin-right: 16px; color: var(--primary);
-        }
-
-        .transaction-info { flex: 1; display: flex; align-items: center; }
-        .transaction-text { flex: 1; }
-        .transaction-type { font-size: 16px; font-weight: 500; color: var(--on-surface); margin-bottom: 2px; }
-        .transaction-date { font-size: 12px; color: var(--on-surface-variant); margin-bottom: 4px; }
-        .transaction-description { font-size: 14px; color: var(--on-surface-variant); }
-        .transaction-amount { text-align: right; }
-        .amount { font-size: 18px; font-weight: 600; display: block; transition: transform 0.2s ease; }
-        .transaction-card:hover .amount { transform: scale(1.05); }
-        .amount.positive { color: var(--positive); }
-        .amount.negative { color: var(--negative); }
-        
-        .highlight { background-color: rgba(255, 255, 0, 0.3); font-weight: bold; border-radius: 2px; padding: 0 2px; color: #000; }
-
-        .sync-icon {
-            color: var(--primary); font-size: 12px; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px;
-        }
-        .sync-icon span:first-child { display: inline-block; animation: spin 2s linear infinite; }
-
-        .loading { display: flex; justify-content: center; align-items: center; padding: 64px; }
-        .spinner { width: 48px; height: 48px; border: 4px solid var(--surface-variant); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-
-        .empty-state, .error-state { text-align: center; padding: 64px 16px; color: var(--on-surface-variant); animation: fadeIn 0.5s ease; }
-
-        .fab {
-            position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; background-color: var(--primary-container); color: var(--on-primary-container);
-            border-radius: 16px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200;
-        }
-        .fab:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.5); transform: scale(1.1) rotate(90deg); }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none;
-            justify-content: center; align-items: center; z-index: 300; backdrop-filter: blur(4px);
-        }
-
-        .modal {
-            background: var(--surface); padding: 24px; border-radius: 28px; width: 95%; max-width: 400px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.5); animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            color: var(--on-surface);
-        }
-
-        .modal h2 { margin-bottom: 24px; font-size: 24px; font-weight: 400; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--on-surface-variant); }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--outline); background: var(--card-bg); color: var(--on-surface); font-size: 16px; transition: border-color 0.2s;
-        }
-        .form-group input:focus { border-color: var(--primary); outline: none; }
-        .form-group input:invalid { border-color: var(--negative); }
-
-        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-        .btn { padding: 10px 24px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
-        .btn-text { background: transparent; color: var(--primary); }
-        .btn-text:hover { background: var(--surface-variant); }
-        .btn-primary { background: var(--primary); color: var(--on-primary); }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .btn-danger { background: transparent; color: var(--negative); }
-        .btn-danger:hover { background: rgba(179, 38, 30, 0.12); }
-
-        .detail-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--surface-variant); }
-        .detail-label { color: var(--on-surface-variant); font-size: 14px; }
-        .detail-value { font-weight: 500; font-size: 14px; }
-    </style>
+    <title>Mifos Field Operations — Offline-First Platform</title>
+    <meta name="description" content="Mifos Mobile offline-first field operations platform for microfinance field officers">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="header">
-        <h1 style="flex: 1;">Savings Dashboard</h1>
-        <div class="header-actions">
-            <button class="sync-all-btn" onclick="syncAll()">Sync All</button>
+    <!-- Top Bar -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left">
+            <h1 class="topbar-title">Mifos Field Ops</h1>
         </div>
-    </div>
-    <div class="header" style="background: var(--surface); color: var(--on-surface-variant); padding: 4px 24px; min-height: auto; border-bottom: 1px solid var(--surface-variant);">
-        <div class="last-updated" id="lastUpdated" style="color: var(--on-surface-variant);">Updated just now</div>
-    </div>
-
-    <div class="container">
-        <div class="balance-card" id="mainBalanceCard">
-            <div class="balance-label">Main Account Balance</div>
-            <div class="balance-amount" id="totalBalance">$0.00</div>
-            
-            <div class="goal-section" onclick="openGoalModal()">
-                <div class="goal-header">
-                    <span>Monthly Savings Goal</span>
-                    <span id="goalPercent">0%</span>
-                </div>
-                <div class="goal-bar-bg">
-                    <div class="goal-bar-fill" id="goalBar" style="--width: 0%;"></div>
-                </div>
-                <div id="goalTargetLabel" style="font-size: 10px; margin-top: 4px; opacity: 0.8;">Target: $2,000.00</div>
-                <div class="celebration-msg">🎉 Goal Achieved! Great job!</div>
+        <div class="topbar-right">
+            <div class="network-badge" id="networkBadge">
+                <span class="net-dot"></span>
+                <span class="net-label">Online</span>
             </div>
-        </div>
-
-        <div class="balance-grid">
-            <div class="balance-sub-card">
-                <div class="balance-sub-label">Available</div>
-                <div class="balance-sub-amount" id="availableBalance">$0.00</div>
+            <div class="sync-badge" id="syncBadge" title="Pending sync items">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span id="syncCount">0</span>
             </div>
-            <div class="balance-sub-card">
-                <div class="balance-sub-label">Pending Sync</div>
-                <div class="balance-sub-amount" id="pendingBalance" style="color: var(--primary);">$0.00</div>
-            </div>
+            <div class="last-sync" id="lastSyncTime">Last sync: Never</div>
         </div>
+    </header>
 
-        <div class="stats-grid" id="statsGrid"></div>
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+        <button class="nav-tab active" data-tab="dashboard" id="tab-dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </button>
+        <button class="nav-tab" data-tab="collections" id="tab-collections">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Collection Sheet
+        </button>
+        <button class="nav-tab" data-tab="syncqueue" id="tab-syncqueue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sync Queue
+        </button>
+    </nav>
 
-        <div class="chart-section">
-            <div class="chart-title">Last 7 Days Trend</div>
-            <div class="chart-container" id="chart"></div>
-        </div>
-
-        <div class="filter-section">
-            <div class="search-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="searchInput" placeholder="Search transactions...">
-                <div id="clearSearch" class="clear-search" onclick="clearSearch()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
+    <!-- ===================== DASHBOARD TAB ===================== -->
+    <main class="tab-content active" id="page-dashboard">
+        <!-- Operational Metrics -->
+        <section class="metrics-grid" id="metricsGrid">
+            <div class="metric-card metric-pending">
+                <div class="metric-value" id="metricPending">18</div>
+                <div class="metric-label">Pending Transactions</div>
+                <div class="metric-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
             </div>
-            <div class="filter-chips">
-                <button class="chip active" onclick="filterByType('ALL')">All</button>
-                <button class="chip" onclick="filterByType('DEPOSIT')">Deposits</button>
-                <button class="chip" onclick="filterByType('WITHDRAWAL')">Withdrawals</button>
-                <button class="chip" onclick="filterByType('INTEREST')">Interest</button>
-                <button class="chip" onclick="filterByType('FEES')">Fees</button>
-            </div>
-            <div class="date-filter-section">
-                <div class="date-input-group">
-                    <label>From</label>
-                    <input type="date" id="startDate" onchange="applyFilters()">
-                </div>
-                <div class="date-input-group">
-                    <label>To</label>
-                    <input type="date" id="endDate" onchange="applyFilters()">
+            <div class="metric-card metric-centers">
+                <div class="metric-value" id="metricCenters">4</div>
+                <div class="metric-label">Centers Assigned</div>
+                <div class="metric-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
             </div>
-        </div>
-
-        <div class="sort-section">
-            <button class="export-btn" onclick="exportToCSV()">Export CSV</button>
-            <select class="sort-select" onchange="filterBySort(this.value)">
-                <option value="DATE_DESC">Date (Newest)</option>
-                <option value="DATE_ASC">Date (Oldest)</option>
-                <option value="AMOUNT_DESC">Amount (Highest)</option>
-                <option value="AMOUNT_ASC">Amount (Lowest)</option>
-            </select>
-        </div>
-
-        <div class="state-controls">
-            <button class="state-btn" onclick="resetDemo()">Reset Cache</button>
-            <button class="state-btn" onclick="showState('success')">Success</button>
-            <button class="state-btn" onclick="showState('empty')">Empty</button>
-            <button class="state-btn" onclick="showState('error')">Error</button>
-        </div>
-
-        <div id="content" class="transactions-list"></div>
-    </div>
-
-    <div class="fab" onclick="openModal()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-    </div>
-
-    <!-- Goal Modal -->
-    <div id="goalModalOverlay" class="modal-overlay">
-        <div class="modal">
-            <h2>Set Monthly Goal</h2>
-            <form id="goalForm" onsubmit="setGoal(event)">
-                <div class="form-group">
-                    <label>Monthly Savings Target ($)</label>
-                    <input type="number" step="0.01" min="0.01" id="goalInput" required placeholder="2000.00">
+            <div class="metric-card metric-meetings">
+                <div class="metric-value" id="metricMeetings">3</div>
+                <div class="metric-label">Meetings Today</div>
+                <div class="metric-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-text" onclick="closeGoalModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Set Goal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Deletion Confirmation Modal -->
-    <div id="confirmModalOverlay" class="modal-overlay">
-        <div class="modal">
-            <h2>Delete Transaction</h2>
-            <p style="margin-bottom: 24px; opacity: 0.8; font-size: 14px;">Are you sure you want to delete this transaction? This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-text" onclick="closeConfirmModal()">Cancel</button>
-                <button type="button" class="btn btn-primary" style="background: var(--negative);" id="confirmDeleteBtn">Delete</button>
             </div>
-        </div>
-    </div>
-
-    <div id="modalOverlay" class="modal-overlay">
-        <div class="modal">
-            <h2>New Transaction</h2>
-            <form id="transactionForm" onsubmit="addTransaction(event)">
-                <div class="form-group">
-                    <label>Amount</label>
-                    <input type="number" step="0.01" min="0.01" id="amount" required placeholder="0.00">
+            <div class="metric-card metric-offline" id="metricOfflineCard">
+                <div class="metric-value" id="metricOfflineQueue">Active</div>
+                <div class="metric-label">Offline Queue</div>
+                <div class="metric-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
                 </div>
-                <div class="form-group">
-                    <label>Type</label>
-                    <select id="type">
-                        <option value="DEPOSIT">Deposit</option>
-                        <option value="WITHDRAWAL">Withdrawal</option>
-                        <option value="INTEREST">Interest</option>
-                        <option value="FEES">Fees</option>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="section">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="quick-actions" id="quickActions">
+                <button class="action-btn" onclick="switchTab('collections')">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    New Collection
+                </button>
+                <button class="action-btn" onclick="startMeeting()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    Start Meeting
+                </button>
+                <button class="action-btn" onclick="retrySyncAll()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Retry Sync
+                </button>
+                <button class="action-btn" onclick="addNewMember()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Add Member
+                </button>
+            </div>
+        </section>
+
+        <!-- Assigned Centers -->
+        <section class="section">
+            <h2 class="section-title">Assigned Centers</h2>
+            <div class="centers-list" id="centersList"></div>
+        </section>
+
+        <!-- Today's Meetings -->
+        <section class="section">
+            <h2 class="section-title">Today's Meetings</h2>
+            <div class="meetings-list" id="meetingsList"></div>
+        </section>
+    </main>
+
+    <!-- ===================== COLLECTION SHEET TAB ===================== -->
+    <main class="tab-content" id="page-collections">
+        <section class="section">
+            <div class="collection-header">
+                <h2 class="section-title">Collection Sheet</h2>
+                <div class="collection-actions">
+                    <select id="centerSelect" class="input-select" onchange="loadCollectionSheet()">
+                        <option value="">Select Center...</option>
                     </select>
+                    <button class="btn-primary" id="saveCollectionBtn" onclick="saveCollectionSheet()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Offline
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <input type="text" id="description" required placeholder="e.g. Monthly deposit">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-text" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="detailOverlay" class="modal-overlay">
-        <div class="modal">
-            <h2>Transaction Details</h2>
-            <div id="detailContent" style="margin-bottom: 8px;"></div>
-            <div class="modal-actions">
-                <button class="btn btn-danger" id="deleteBtn">Delete</button>
-                <div style="flex: 1;"></div>
-                <button class="btn btn-primary" onclick="closeDetail()">Close</button>
             </div>
-        </div>
+
+            <!-- Collection Stats Bar -->
+            <div class="collection-stats" id="collectionStats">
+                <div class="cstat"><span class="cstat-val" id="cstatMembers">0</span><span class="cstat-lbl">Members</span></div>
+                <div class="cstat"><span class="cstat-val" id="cstatSavings">$0</span><span class="cstat-lbl">Savings</span></div>
+                <div class="cstat"><span class="cstat-val" id="cstatLoans">$0</span><span class="cstat-lbl">Loan Payments</span></div>
+                <div class="cstat"><span class="cstat-val" id="cstatComplete">0%</span><span class="cstat-lbl">Complete</span></div>
+            </div>
+
+            <!-- Collection Table -->
+            <div class="table-wrapper">
+                <table class="collection-table" id="collectionTable">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Savings ($)</th>
+                            <th>Loan Payment ($)</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collectionBody">
+                        <tr class="empty-row"><td colspan="5">Select a center to load collection sheet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Batch Actions -->
+            <div class="batch-actions" id="batchActions" style="display:none;">
+                <button class="btn-outline" onclick="validateAll()">Validate All</button>
+                <button class="btn-primary" onclick="submitBatch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Submit Batch
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== SYNC QUEUE TAB ===================== -->
+    <main class="tab-content" id="page-syncqueue">
+        <section class="section">
+            <div class="sync-header">
+                <h2 class="section-title">Sync Queue</h2>
+                <button class="btn-primary" onclick="retrySyncAll()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Retry All
+                </button>
+            </div>
+
+            <!-- Sync Summary -->
+            <div class="sync-summary" id="syncSummary">
+                <div class="sync-stat">
+                    <div class="sync-stat-val" id="syncQueued">0</div>
+                    <div class="sync-stat-lbl">Queued</div>
+                </div>
+                <div class="sync-stat sync-stat-fail">
+                    <div class="sync-stat-val" id="syncFailed">0</div>
+                    <div class="sync-stat-lbl">Failed</div>
+                </div>
+                <div class="sync-stat sync-stat-ok">
+                    <div class="sync-stat-val" id="syncSuccess">0</div>
+                    <div class="sync-stat-lbl">Synced</div>
+                </div>
+                <div class="sync-stat">
+                    <div class="sync-stat-val" id="syncRetries">0</div>
+                    <div class="sync-stat-lbl">Retries</div>
+                </div>
+            </div>
+
+            <!-- Sync Progress -->
+            <div class="sync-progress-wrap" id="syncProgressWrap" style="display:none;">
+                <div class="sync-progress-label">Syncing... <span id="syncProgressPct">0%</span></div>
+                <div class="sync-progress-bar"><div class="sync-progress-fill" id="syncProgressFill"></div></div>
+            </div>
+
+            <!-- Connectivity State -->
+            <div class="connectivity-card" id="connectivityCard">
+                <div class="conn-icon" id="connIcon">🟢</div>
+                <div class="conn-text">
+                    <div class="conn-status" id="connStatus">Connected</div>
+                    <div class="conn-detail" id="connDetail">All sync operations will execute immediately</div>
+                </div>
+            </div>
+
+            <!-- Sync Items List -->
+            <div class="sync-items-list" id="syncItemsList"></div>
+        </section>
+    </main>
+
+    <!-- Offline Mode Banner -->
+    <div class="offline-banner" id="offlineBanner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <span>Offline Mode — Changes saved locally. Will sync when connection restores.</span>
     </div>
 
-    <script>
-        const initialMockTransactions = [
-            { id: 1, amount: 500.00, date: new Date("2026-05-10T10:30:00").getTime(), transactionType: "DEPOSIT", accountId: 12345, description: "Monthly deposit", isPendingSync: false },
-            { id: 2, amount: 150.00, date: new Date("2026-05-09T14:22:00").getTime(), transactionType: "WITHDRAWAL", accountId: 12345, description: "ATM withdrawal", isPendingSync: false },
-            { id: 3, amount: 25.50, date: new Date("2026-05-08T09:00:00").getTime(), transactionType: "INTEREST", accountId: 12345, description: "Interest earned", isPendingSync: false },
-            { id: 4, amount: 10.00, date: new Date("2026-05-07T11:15:00").getTime(), transactionType: "FEES", accountId: 12345, description: "Monthly service fee", isPendingSync: true },
-            { id: 5, amount: 1000.00, date: new Date("2026-05-06T16:45:00").getTime(), transactionType: "DEPOSIT", accountId: 12345, description: "Salary deposit", isPendingSync: false },
-            { id: 6, amount: 75.00, date: new Date("2026-05-05T13:30:00").getTime(), transactionType: "WITHDRAWAL", accountId: 12345, description: "Online transfer", isPendingSync: false },
-            { id: 7, amount: 200.00, date: new Date("2026-05-04T10:00:00").getTime(), transactionType: "DEPOSIT", accountId: 12345, description: "Cash deposit", isPendingSync: false },
-            { id: 8, amount: 15.75, date: new Date("2026-05-03T08:30:00").getTime(), transactionType: "INTEREST", accountId: 12345, description: "Interest earned", isPendingSync: false }
-        ];
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
 
-        const TYPE_ICONS = {
-            'DEPOSIT': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>',
-            'WITHDRAWAL': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>',
-            'INTEREST': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 16 8.5 11 1 16"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
-            'FEES': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"></path><path d="M14 8H8"></path><path d="M16 12H8"></path><path d="M13 16H8"></path></svg>',
-            'DEFAULT': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
-        };
-
-        let currentState = 'loading';
-        let transactions = [];
-        let currentTypeFilter = 'ALL';
-        let currentSearchQuery = '';
-        let currentSortOrder = 'DATE_DESC';
-        let monthlyGoal = 2000.00;
-        let pendingDeleteId = null;
-
-        function loadFromStorage() {
-            const savedData = localStorage.getItem('mifos_transactions');
-            if (savedData) transactions = JSON.parse(savedData).map(t => ({...t, date: new Date(t.date)}));
-            else transactions = initialMockTransactions.map(t => ({...t, date: new Date(t.date)}));
-            const savedGoal = localStorage.getItem('mifos_savings_goal');
-            if (savedGoal) monthlyGoal = parseFloat(savedGoal);
-        }
-
-        function saveToStorage() { localStorage.setItem('mifos_transactions', JSON.stringify(transactions)); localStorage.setItem('mifos_savings_goal', monthlyGoal.toString()); }
-
-        function calculateBalance() {
-            let total = 0; let pending = 0;
-            let deposits = 0; let withdrawals = 0; let interest = 0; let fees = 0;
-            transactions.forEach(t => {
-                const isPositive = t.transactionType === 'DEPOSIT' || t.transactionType === 'INTEREST';
-                const amount = isPositive ? t.amount : -t.amount;
-                if (!t.isPendingSync) total += amount; else pending += amount;
-                if (t.transactionType === 'DEPOSIT') deposits += t.amount;
-                else if (t.transactionType === 'WITHDRAWAL') withdrawals += t.amount;
-                else if (t.transactionType === 'INTEREST') interest += t.amount;
-                else if (t.transactionType === 'FEES') fees += t.amount;
-            });
-            document.getElementById('totalBalance').innerText = `$${(total + pending).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('availableBalance').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('pendingBalance').innerText = `${pending >= 0 ? '+' : ''}$${pending.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('lastUpdated').innerText = `Updated at ${new Date().toLocaleTimeString()}`;
-            
-            const currentSavings = deposits + interest;
-            const percent = Math.min(Math.round((currentSavings / monthlyGoal) * 100), 100);
-            document.getElementById('goalPercent').innerText = `${percent}%`;
-            document.getElementById('goalBar').style.setProperty('--width', `${percent}%`);
-            document.getElementById('goalTargetLabel').innerText = `Target: $${monthlyGoal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            
-            const card = document.getElementById('mainBalanceCard');
-            card.classList.toggle('goal-reached', percent >= 100);
-
-            renderStats(deposits, withdrawals, interest, fees);
-            updateChart();
-        }
-
-        function renderStats(d, w, i, f) {
-            const grid = document.getElementById('statsGrid');
-            grid.innerHTML = `
-                <div class="stat-item"><div class="stat-header"><span style="color:var(--positive)">${TYPE_ICONS['DEPOSIT']}</span> Deposits</div><div class="stat-value">$${d.toFixed(2)}</div></div>
-                <div class="stat-item"><div class="stat-header"><span style="color:var(--negative)">${TYPE_ICONS['WITHDRAWAL']}</span> Withdrawals</div><div class="stat-value">$${w.toFixed(2)}</div></div>
-                <div class="stat-item"><div class="stat-header"><span style="color:#2196F3">${TYPE_ICONS['INTEREST']}</span> Interest</div><div class="stat-value">$${i.toFixed(2)}</div></div>
-                <div class="stat-item"><div class="stat-header"><span style="color:#FF9800">${TYPE_ICONS['FEES']}</span> Fees</div><div class="stat-value">$${f.toFixed(2)}</div></div>
-            `;
-        }
-
-        function updateChart() {
-            const chart = document.getElementById('chart');
-            const last7Days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0); return d; }).reverse();
-            const dailyTotals = last7Days.map(date => { return transactions.filter(t => t.date.toDateString() === date.toDateString()).reduce((acc, t) => { const isPositive = t.transactionType === 'DEPOSIT' || t.transactionType === 'INTEREST'; return acc + (isPositive ? t.amount : -t.amount); }, 0); });
-            const max = Math.max(...dailyTotals.map(Math.abs), 100);
-            chart.innerHTML = dailyTotals.map((total, i) => { const height = Math.max(Math.abs(total) / max * 100, 5); const color = total >= 0 ? 'var(--positive)' : 'var(--negative)'; const day = last7Days[i].toLocaleDateString('en-US', { weekday: 'short' }).charAt(0); return `<div class="chart-bar-wrapper"><div class="chart-tooltip">$${total.toFixed(2)}</div><div class="chart-bar" style="--height: ${height}%; background: ${color}"></div><div class="chart-label">${day}</div></div>`; }).join('');
-        }
-
-        function formatDate(date) { return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }); }
-        function formatTime(date) { return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); }
-
-        function highlightText(text, query) { if (!query) return text; const regex = new RegExp(`(${query})`, 'gi'); return text.replace(regex, '<span class="highlight">$1</span>'); }
-
-        function renderTransactions(transactionsToRender) {
-            const content = document.getElementById('content');
-            if (transactionsToRender.length === 0) { content.innerHTML = `<div class="empty-state"><p>No transactions found</p></div>`; calculateBalance(); return; }
-            let sorted = [...transactionsToRender];
-            if (currentSortOrder === 'DATE_DESC') sorted.sort((a,b) => b.date - a.date);
-            else if (currentSortOrder === 'DATE_ASC') sorted.sort((a,b) => a.date - b.date);
-            else if (currentSortOrder === 'AMOUNT_DESC') sorted.sort((a,b) => b.amount - a.amount);
-            else if (currentSortOrder === 'AMOUNT_ASC') sorted.sort((a,b) => a.amount - b.amount);
-            const groups = sorted.reduce((acc, t) => { const dateKey = formatDate(t.date); if (!acc[dateKey]) acc[dateKey] = []; acc[dateKey].push(t); return acc; }, {});
-            let html = ''; let itemIndex = 0;
-            Object.keys(groups).forEach(date => { html += `<div class="date-header">${date}</div>`; groups[date].forEach(t => { const icon = TYPE_ICONS[t.transactionType] || TYPE_ICONS['DEFAULT']; const description = t.description ? `<div class="transaction-description">${highlightText(t.description, currentSearchQuery)}</div>` : ''; html += `<div class="transaction-card" onclick="openDetail(${t.id})" style="animation-delay: ${itemIndex * 0.05}s"><div class="transaction-info"><div class="type-icon">${icon}</div><div class="transaction-text"><div class="transaction-type">${t.transactionType}</div><div class="transaction-date">${formatTime(t.date)}</div>${description}</div></div><div class="transaction-amount"><span class="amount ${t.transactionType === 'DEPOSIT' || t.transactionType === 'INTEREST' ? 'positive' : 'negative'}">${t.transactionType === 'DEPOSIT' || t.transactionType === 'INTEREST' ? '+' : '-'}$${t.amount.toFixed(2)}</span>${t.isPendingSync ? '<div class="sync-icon"><span>🔄</span><span>Syncing...</span></div>' : ''}</div></div>`; itemIndex++; }); });
-            content.innerHTML = html; calculateBalance();
-        }
-
-        function applyFilters() {
-            let filtered = transactions;
-            if (currentTypeFilter !== 'ALL') filtered = filtered.filter(t => t.transactionType === currentTypeFilter);
-            const start = document.getElementById('startDate').value;
-            const end = document.getElementById('endDate').value;
-            if (start) filtered = filtered.filter(t => t.date >= new Date(start));
-            if (end) { const endD = new Date(end); endD.setHours(23,59,59,999); filtered = filtered.filter(t => t.date <= endD); }
-            if (currentSearchQuery) { const query = currentSearchQuery.toLowerCase(); filtered = filtered.filter(t => t.transactionType.toLowerCase().includes(query) || (t.description && t.description.toLowerCase().includes(query)) || t.amount.toString().includes(query)); document.getElementById('clearSearch').style.display = 'block'; } else { document.getElementById('clearSearch').style.display = 'none'; }
-            renderTransactions(filtered);
-        }
-
-        function filterByType(type) { currentTypeFilter = type; const chips = document.querySelectorAll('.chip'); chips.forEach(chip => chip.classList.toggle('active', chip.innerText.toUpperCase().includes(type) || (type === 'ALL' && chip.innerText === 'All'))); applyFilters(); }
-        function filterBySort(order) { currentSortOrder = order; applyFilters(); }
-        function clearSearch() { document.getElementById('searchInput').value = ''; currentSearchQuery = ''; applyFilters(); }
-
-        function loadTransactions() { currentState = 'loading'; document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div></div>'; setTimeout(() => { currentState = 'success'; loadFromStorage(); applyFilters(); }, 800); }
-        function showState(state) { currentState = state; if (state === 'success') { loadFromStorage(); applyFilters(); } else if (state === 'empty') renderTransactions([]); else if (state === 'error') document.getElementById('content').innerHTML = `<div class="error-state"><p>Failed to load data</p><button class="btn btn-primary" style="margin-top:16px;" onclick="loadTransactions()">Retry</button></div>`; }
-        function resetDemo() { localStorage.removeItem('mifos_transactions'); localStorage.removeItem('mifos_savings_goal'); loadTransactions(); }
-
-        function syncAll() { transactions.filter(t => t.isPendingSync).forEach((t, i) => { setTimeout(() => { t.isPendingSync = false; saveToStorage(); applyFilters(); }, (i + 1) * 600); }); }
-        function openModal() { document.getElementById('modalOverlay').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; document.getElementById('transactionForm').reset(); }
-        function openGoalModal() { document.getElementById('goalInput').value = monthlyGoal; document.getElementById('goalModalOverlay').style.display = 'flex'; }
-        function closeGoalModal() { document.getElementById('goalModalOverlay').style.display = 'none'; }
-        function setGoal(event) { event.preventDefault(); monthlyGoal = parseFloat(document.getElementById('goalInput').value); saveToStorage(); calculateBalance(); closeGoalModal(); }
-
-        function openDetail(id) {
-            const t = transactions.find(tx => tx.id === id); if (!t) return;
-            const isPositive = t.transactionType === 'DEPOSIT' || t.transactionType === 'INTEREST';
-            document.getElementById('detailContent').innerHTML = `<div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">${t.transactionType}</span></div><div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value" style="color: ${isPositive ? 'var(--positive)' : 'var(--negative)'}">${isPositive ? '+' : '-'}$${t.amount.toFixed(2)}</span></div><div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${formatDate(t.date)}, ${formatTime(t.date)}</span></div><div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">${t.description || 'N/A'}</span></div><div class="detail-row"><span class="detail-label">Account ID</span><span class="detail-value">${t.accountId}</span></div><div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${t.isPendingSync ? '🔄 Syncing...' : '✅ Synced'}</span></div>`;
-            document.getElementById('deleteBtn').onclick = () => { openConfirmModal(t.id); };
-            document.getElementById('detailOverlay').style.display = 'flex';
-        }
-        function closeDetail() { document.getElementById('detailOverlay').style.display = 'none'; }
-
-        function openConfirmModal(id) { pendingDeleteId = id; document.getElementById('confirmModalOverlay').style.display = 'flex'; }
-        function closeConfirmModal() { document.getElementById('confirmModalOverlay').style.display = 'none'; pendingDeleteId = null; }
-        document.getElementById('confirmDeleteBtn').onclick = () => { if (pendingDeleteId) { transactions = transactions.filter(t => t.id !== pendingDeleteId); saveToStorage(); applyFilters(); closeConfirmModal(); closeDetail(); } };
-
-        function addTransaction(event) { event.preventDefault(); const newTx = { id: Date.now(), amount: parseFloat(document.getElementById('amount').value), date: new Date().getTime(), transactionType: document.getElementById('type').value, accountId: 12345, description: document.getElementById('description').value, isPendingSync: true }; transactions.unshift(newTx); saveToStorage(); applyFilters(); closeModal(); setTimeout(() => { const tx = transactions.find(t => t.id === newTx.id); if (tx) { tx.isPendingSync = false; saveToStorage(); applyFilters(); } }, 3000); }
-
-        function exportToCSV() { const headers = "ID,Date,Type,Amount,Description,Status\n"; const rows = transactions.map(t => `${t.id},"${new Date(t.date).toISOString()}",${t.transactionType},${t.amount},"${t.description || ''}",${t.isPendingSync ? 'Pending' : 'Synced'}`).join("\n"); const blob = new Blob([headers + rows], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.setAttribute('hidden', ''); a.setAttribute('href', url); a.setAttribute('download', 'transactions.csv'); document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-
-        document.getElementById('searchInput').addEventListener('input', (e) => { currentSearchQuery = e.target.value; if (currentState === 'success') applyFilters(); });
-        loadTransactions();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

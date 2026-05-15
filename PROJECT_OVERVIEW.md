@@ -200,7 +200,7 @@ mifosmobile/
 │       └── src/main/java/.../
 │           └── UiState.kt
 └── features/
-    └── savings-transaction/     # Feature module
+    └── group-save/     # Feature module
         └── src/main/java/.../
             ├── data/           # Data layer
             │   ├── local/      # Room entities & DAOs
@@ -225,7 +225,7 @@ app
 ├── core:database
 ├── core:network
 ├── core:common
-└── features:savings-transaction
+└── features:group-save
     ├── core:database
     ├── core:network
     └── core:common
@@ -313,7 +313,7 @@ The project includes comprehensive tests:
 
 Run tests:
 ```bash
-./gradlew :features:savings-transaction:test
+./gradlew :features:group-save:test
 ```
 
 ---
@@ -353,7 +353,7 @@ The project follows a phased execution plan. See [EXECUTION_PLAN.md](./EXECUTION
 
 ### Run Tests
 ```bash
-./gradlew :features:savings-transaction:test
+./gradlew :features:group-save:test
 ```
 
 ---

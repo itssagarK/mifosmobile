@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.mifos.mobile.core.database.AppDatabase
-import org.mifos.mobile.features.savings.transaction.data.local.dao.SavingsTransactionDao
+import org.mifos.mobile.features.group.save.data.local.dao.SavingsTransactionDao
 import javax.inject.Singleton
 
 @Module

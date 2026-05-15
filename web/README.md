@@ -1,6 +1,6 @@
 # Web Version - Savings Transactions
 
-This is a standalone web version of the Savings Transaction feature from the Mifos Mobile Android app.
+This is a standalone web version of the Savings Transaction feature from the Mifos Mobile Android app. It is designed to be feature-complete with the mobile version, providing a consistent experience across platforms.
 
 ## How to Run
 
@@ -21,24 +21,22 @@ python -m http.server 8080
 # Open in browser: http://localhost:8080
 ```
 
-### Option 3: VS Code Live Server
-If using VS Code, install the "Live Server" extension and click "Go Live" at the bottom right.
+## Advanced Features
 
-## Features
-
-- Displays a list of savings transactions with:
-  - Transaction type (Deposit, Withdrawal, Interest, Fees)
-  - Date and time
-  - Description
-  - Amount (green for deposits/interest, red for withdrawals/fees)
-  - Sync status indicator
-- Search functionality to filter transactions
-- Loading state with spinner
-- Empty state when no results match search
+- **Responsive Desktop/Tablet Layout**: 
+  - **Mobile**: Single-column transaction list with modal details.
+  - **Tablet (>=1024px)**: Fixed sidebar for statistics, balance, and goal tracking.
+  - **Desktop (>=1440px)**: 3-pane view with a dedicated, animated Detail Pane on the right for seamless transitions.
+- **Advanced Multi-Category Filtering**: Select multiple transaction types simultaneously (Deposit, Withdrawal, Interest, Fees) to refine your view.
+- **UI Polish & Shimmer**: Modern shimmer effect during loading for better perceived performance, matching the Android app's aesthetic.
+- **Trend Visualization**: Interactive 7-day trend chart with tooltips showing daily net change.
+- **Goal Tracking**: Set and visualize monthly savings goals with celebration states.
+- **Offline-First Experience**: Data persists in `localStorage` and includes sync status indicators for newly added transactions.
 
 ## Mock Data
 
 The app includes sample mock data demonstrating various transaction types. The data simulates:
-- Initial loading delay (1 second)
-- Search/filter by transaction type or description
-- Visual indicators for pending sync status
+- Shimmer loading state (1.2 second delay)
+- Search/filter by transaction type, amount, or description
+- Automatic "sync" simulation for new transactions after 3 seconds
+- Export capability to CSV format for external tracking
