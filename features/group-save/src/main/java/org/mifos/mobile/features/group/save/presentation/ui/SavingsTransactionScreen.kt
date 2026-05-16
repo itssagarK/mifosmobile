@@ -52,6 +52,7 @@ fun SavingsTransactionScreen(
     onCollectionSheetClick: () -> Unit,
     onViewGroupsClick: () -> Unit,
     onSyncStatusClick: () -> Unit,
+    onLinkedAccountsClick: () -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -16,11 +16,13 @@ class SavingsTransactionRepositoryImplTest {
     private lateinit var repository: SavingsTransactionRepositoryImpl
     private val api: SavingsTransactionApi = mockk()
     private val dao: SavingsTransactionDao = mockk()
+    private val userPreferencesRepository: UserPreferencesRepository = mockk()
     private val context: Context = mockk()
 
     @Before
     fun setUp() {
-        repository = SavingsTransactionRepositoryImpl(api, dao, context)
+        coEvery { userPreferencesRepository.updateLastSyncTimestamp(any()) } just Runs
+        repository = SavingsTransactionRepositoryImpl(api, dao, userPreferencesRepository, context)
     }
 
     @Test

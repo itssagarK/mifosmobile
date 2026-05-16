@@ -20,7 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.mifos.mobile.features.group.save.presentation.ui.*
-import org.mifos.mobile.ui.theme.MifosMobileTheme
+import org.mifos.mobile.core.common.ui.theme.MifosMobileTheme
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
@@ -68,6 +69,10 @@ class MainActivity : ComponentActivity() {
                                 currentScreen = Screen.SyncStatus
                                 scope.launch { drawerState.close() }
                             }
+                            NavigationItem("Linked Accounts", Icons.Default.AccountBalanceWallet, currentScreen == Screen.PocketDashboard) {
+                                currentScreen = Screen.PocketDashboard
+                                scope.launch { drawerState.close() }
+                            }
                             
                             Spacer(Modifier.weight(1f))
                             
@@ -91,6 +96,7 @@ class MainActivity : ComponentActivity() {
                                         onCollectionSheetClick = { currentScreen = Screen.CollectionSheet },
                                         onViewGroupsClick = { currentScreen = Screen.GroupList },
                                         onSyncStatusClick = { currentScreen = Screen.SyncStatus },
+                                        onLinkedAccountsClick = { currentScreen = Screen.PocketDashboard },
                                         onMenuClick = { scope.launch { drawerState.open() } }
                                     )
                                 }
@@ -135,6 +141,51 @@ class MainActivity : ComponentActivity() {
                                 Screen.Settings -> {
                                     SettingsScreen(onBack = { currentScreen = Screen.Dashboard })
                                 }
+                                Screen.PocketDashboard -> {
+                                    // Using mock data for MVP prototype
+                                    val mockSummary = remember { 
+                                        PocketSummary(12450.50, 3, "Synced Just Now") 
+                                    }
+                                    val mockAccounts = remember {
+                                        mutableStateListOf(
+                                            LinkedAccount("1", AccountType.SAVINGS, "**** 4582", 8500.00, "Active"),
+                                            LinkedAccount("2", AccountType.LOAN, "**** 1104", 3500.50, "Active"),
+                                            LinkedAccount("3", AccountType.SHARES, "**** 9921", 450.00, "Pending")
+                                        )
+                                    }
+                                    
+                                    PocketDashboardScreen(
+                                        summary = mockSummary,
+                                        accounts = mockAccounts,
+                                        onBackClick = { currentScreen = Screen.Dashboard },
+                                        onAccountDetailsClick = { currentScreen = Screen.AccountDetail(it) },
+                                        onLinkAccount = { type, num -> 
+                                            mockAccounts.add(LinkedAccount(UUID.randomUUID().toString(), type, num, 0.0, "Active"))
+                                        },
+                                        onDelinkAccount = { account ->
+                                            mockAccounts.remove(account)
+                                        }
+                                    )
+                                }
+                                is Screen.AccountDetail -> {
+                                    val mockActivities = remember {
+                                        listOf(
+                                            AccountActivityItem("1", "Deposit from Pocket", "Today, 10:30 AM", 500.00, true),
+                                            AccountActivityItem("2", "Monthly Interest", "Yesterday", 12.50, true),
+                                            AccountActivityItem("3", "Transfer to Loan", "14 May 2026", 250.00, false),
+                                            AccountActivityItem("4", "Maintenance Fee", "01 May 2026", 5.00, false)
+                                        )
+                                    }
+                                    AccountDetailsScreen(
+                                        account = screen.account,
+                                        activities = mockActivities,
+                                        onBackClick = { currentScreen = Screen.PocketDashboard },
+                                        onDelinkClick = { 
+                                            // Handled via back navigation for MVP
+                                            currentScreen = Screen.PocketDashboard 
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -168,4 +219,6 @@ sealed class Screen {
     data class MeetingWorkflow(val groupId: Long) : Screen()
     data object SyncStatus : Screen()
     data object Settings : Screen()
+    data object PocketDashboard : Screen()
+    data class AccountDetail(val account: LinkedAccount) : Screen()
 }

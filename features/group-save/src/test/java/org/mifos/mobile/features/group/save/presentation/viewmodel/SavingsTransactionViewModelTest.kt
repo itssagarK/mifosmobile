@@ -9,7 +9,10 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mifos.mobile.core.common.NetworkMonitor
 import org.mifos.mobile.core.common.UiState
+import org.mifos.mobile.features.group.save.data.repository.UserPreferences
+import org.mifos.mobile.features.group.save.data.repository.UserPreferencesRepository
 import org.mifos.mobile.features.group.save.domain.model.SavingsTransaction
 import org.mifos.mobile.features.group.save.domain.model.TransactionType
 import org.mifos.mobile.features.group.save.domain.usecase.*
@@ -27,6 +30,9 @@ class SavingsTransactionViewModelTest {
     private val deleteTransaction: DeleteSavingsTransactionUseCase = mockk()
     private val syncPending: SyncPendingTransactionsUseCase = mockk()
     private val refreshTransactions: RefreshSavingsTransactionsUseCase = mockk()
+    
+    private val preferencesRepository: UserPreferencesRepository = mockk()
+    private val networkMonitor: NetworkMonitor = mockk()
     
     private lateinit var viewModel: SavingsTransactionViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -46,7 +52,11 @@ class SavingsTransactionViewModelTest {
         every { getTransactionsNonPaged(any(), any(), any(), any(), any(), any()) } returns flowOf(emptyList())
         coEvery { refreshTransactions(any()) } just Runs
         
-        viewModel = SavingsTransactionViewModel(useCases)
+        every { preferencesRepository.userPreferencesFlow } returns flowOf(UserPreferences(SortOrder.DATE_DESC, emptySet()))
+        coEvery { preferencesRepository.updateLastSyncTimestamp(any()) } just Runs
+        every { networkMonitor.isOnline } returns flowOf(true)
+        
+        viewModel = SavingsTransactionViewModel(useCases, preferencesRepository, networkMonitor)
     }
 
     @After
@@ -63,7 +73,7 @@ class SavingsTransactionViewModelTest {
         every { getTransactionsNonPaged(any(), any(), any(), any(), any(), any()) } returns flowOf(transactions)
         
         // When
-        viewModel = SavingsTransactionViewModel(useCases)
+        viewModel = SavingsTransactionViewModel(useCases, preferencesRepository, networkMonitor)
 
         // Then
         viewModel.summaryState.test {
@@ -106,7 +116,7 @@ class SavingsTransactionViewModelTest {
         coEvery { refreshTransactions(any()) } throws Exception("Network Error")
         
         // When
-        viewModel = SavingsTransactionViewModel(useCases)
+        viewModel = SavingsTransactionViewModel(useCases, preferencesRepository, networkMonitor)
 
         // Then
         viewModel.summaryState.test {

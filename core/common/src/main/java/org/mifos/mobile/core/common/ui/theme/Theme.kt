@@ -1,4 +1,4 @@
-package org.mifos.mobile.ui.theme
+package org.mifos.mobile.core.common.ui.theme
 
 import android.app.Activity
 import android.os.Build

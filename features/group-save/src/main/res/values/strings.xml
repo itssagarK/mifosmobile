@@ -91,4 +91,33 @@
     <string name="last_synced_at">Last Sync: %1$s</string>
     <string name="connectivity_online">System Online</string>
     <string name="connectivity_offline">System Offline - Queuing Operations</string>
+
+    <!-- Pocket Dashboard -->
+    <string name="pocket_dashboard">Pocket Dashboard</string>
+    <string name="total_pocket_balance">Total Pocket Balance</string>
+    <string name="total_linked_accounts">Total Linked Accounts</string>
+    <string name="last_sync_status">Last Sync Status</string>
+    <string name="savings_account">Savings Account</string>
+    <string name="loan_account">Loan Account</string>
+    <string name="shares_account">Shares Account</string>
+    <string name="link_account">Link Account</string>
+    <string name="view_details">View Details</string>
+    <string name="delink_account">Delink Account</string>
+    <string name="delink_confirmation_title">Delink Account?</string>
+    <string name="delink_confirmation_desc">Are you sure you want to delink this account? You will need to re-verify to link it again.</string>
+    <string name="account_linked_success">Account linked successfully!</string>
+    <string name="select_account_type">Select Account Type</string>
+    <string name="available_accounts">Available Accounts</string>
+    <string name="confirm_link">Confirm Linking</string>
+
+    <!-- Account Details -->
+    <string name="account_details">Account Details</string>
+    <string name="account_name">Account Name</string>
+    <string name="account_type">Account Type</string>
+    <string name="account_number">Account Number</string>
+    <string name="available_balance">Available Balance</string>
+    <string name="pocket_status">Pocket Status</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="view_transactions">View Transactions</string>
+    <string name="linked">Linked</string>
 </resources>

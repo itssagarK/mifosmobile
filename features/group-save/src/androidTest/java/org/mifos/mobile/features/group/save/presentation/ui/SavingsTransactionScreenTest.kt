@@ -38,7 +38,14 @@ class SavingsTransactionScreenTest {
 
         // When
         composeTestRule.setContent {
-            SavingsTransactionScreen(viewModel = viewModel)
+            SavingsTransactionScreen(
+                viewModel = viewModel,
+                onCollectionSheetClick = {},
+                onViewGroupsClick = {},
+                onSyncStatusClick = {},
+                onLinkedAccountsClick = {},
+                onMenuClick = {}
+            )
         }
 
         // Then
@@ -59,7 +66,14 @@ class SavingsTransactionScreenTest {
 
         // When
         composeTestRule.setContent {
-            SavingsTransactionScreen(viewModel = viewModel)
+            SavingsTransactionScreen(
+                viewModel = viewModel,
+                onCollectionSheetClick = {},
+                onViewGroupsClick = {},
+                onSyncStatusClick = {},
+                onLinkedAccountsClick = {},
+                onMenuClick = {}
+            )
         }
         composeTestRule.onNodeWithText("Add Transaction").performClick()
 
